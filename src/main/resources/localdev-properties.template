@@ -1,0 +1,4 @@
+# for use in apply bar overrides
+# copy the values in the /target/default.properties file generated during the build and override below per environment
+
+

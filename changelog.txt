@@ -1,0 +1,4 @@
+1.0
+---
+* forked from maven-wmb7-plugin:1.9-SNAPSHOT
+* refactored to provide identical functionality for iib9

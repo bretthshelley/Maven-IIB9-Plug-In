@@ -1,0 +1,40 @@
+# define the integration server to mqsideploy the bar file to for this environment (must be defined! all other values are optional)
+integrationServerName=
+
+
+# identifies the name of a locally defined broker. You cannot use this option if the broker is on a remote computer.
+# brokerName=
+ 
+# The host name or the IP address of the computer on which the broker is running. If you do not specify this parameter, a value that represents the local computer is used.
+ipAddress=
+
+# The TCP port on which the broker's queue manager is listening. If you do not specify this parameter, the value 1414 is used.
+port=
+
+# The name of the broker's queue manager. If you do not specify this parameter, a value that represents the default queue manager on the local computer is used.
+qMgr=
+
+# describes the set of objects that you want to remove from the integration server. You can specify multiple files to delete by separating the filenames with a colon (:).
+deployedObjects= 
+
+
+# specifies deployment of complete information.
+# The default operation is a delta or incremental deployment. Use the -m parameter to override the default operation and run a complete deployment.
+# For a BAR file deployment, -m removes all currently-deployed message flows and message sets from the integration server as part of the deployment.
+# If you do not set -m, the contents of the BAR file are deployed in addition to what is already deployed to the integration server.
+#  Any deployed objects with the same name as an item inside the BAR file are replaced by the version inside the BAR file.
+# For a remove message flow or message set operation, the -m parameter is ignored.
+# acceptable values are true, false, or null
+completeDeployment=
+
+# sends internal debug trace information to the specified file.
+mqsiDeployTraceFileName=
+
+# 
+# specifies the maximum time in seconds that the command waits for the broker to complete the request before returning.
+# You can set this parameter to a value in the range 1 - 2 145 336 164.
+# If you do not provide a timeoutValue value, or you set a value less than 1 or greater than 2 145 336 164 is specified, an error is returned.
+# Set this parameter to a value greater than the sum of the configuration timeout parameters ConfigurationChangeTimeout and InternalConfigurationTimeout
+# that you specified for the broker, if you want to ensure that a response is received within the timeoutValue period.
+# If you set a smaller value, the response returned might indicate that the state of the deploy request is unknown.
+timeoutSecs=600
