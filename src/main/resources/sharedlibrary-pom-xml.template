@@ -4,7 +4,7 @@
 	<groupId><<groupId>></groupId>
 	<artifactId><<artifactId>></artifactId>
 	<version><<version>></version>
-	<packaging>iib-bar</packaging>
+	<packaging>iib-shlib-bar</packaging>
 
 	<profiles>
 		<profile>
@@ -16,7 +16,7 @@
 				<workspace><<workspace>></workspace>
 				<initialDeletes>**/*.jar</initialDeletes>
 				<unpackIibDependenciesIntoWorkspace>true</unpackIibDependenciesIntoWorkspace>
-				<pathToMqsiProfileScript>C:\Program Files\IBM\MQSI\9.0.0.2\bin\mqsiprofile.cmd</pathToMqsiProfileScript>
+				<pathToMqsiProfileScript>C:\Program Files\IBM\MQSI\10.0.0.6\bin\mqsiprofile.cmd</pathToMqsiProfileScript>
 				<failOnInvalidProperties>true</failOnInvalidProperties>
 				<useClassloaders>false</useClassloaders>
 				<failOnInvalidClassloader>true</failOnInvalidClassloader>
@@ -27,7 +27,6 @@
 			</properties>		
 		</profile>	
 	</profiles>
-	
 	
 	<build>
 		<plugins>
