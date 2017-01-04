@@ -24,13 +24,15 @@ import ch.sbb.maven.plugins.iib.utils.EclipseProjectUtils;
  */
 public class EclipseProjUtils extends EclipseProjectUtils {
 
-    private static ProjectDescription getProjectDescription(File projectDirectory) throws MojoFailureException {
+    private static ProjectDescription getProjectDescription(File projectDirectory, Log log) throws MojoFailureException {
         ProjectDescription projectDescription = new ProjectDescription();
         try {
+            log.debug("In EclipseProjUtils.getProjectDescription processing " + projectDirectory.getAbsolutePath());
             // unmarshall the .project file, which is in the temp workspace
             // under a directory of the same name as the projectName
             projectDescription = unmarshallEclipseProjectFile(new File(
                     projectDirectory, ".project"));
+            log.debug("EclipseProjUtils.getProjectDescription OK, name:" + projectDescription.getName());
         } catch (JAXBException e) {
             throw (new MojoFailureException(
                     "Error parsing .project file in: " + projectDirectory.getPath(), e));
@@ -51,7 +53,7 @@ public class EclipseProjUtils extends EclipseProjectUtils {
                 ret = ProjectType.BARFILES;
             } else {
                 // Determine type by nature
-                List<String> natureList = getProjectDescription(projectDirectory).getNatures().getNature();
+                List<String> natureList = getProjectDescription(projectDirectory, log).getNatures().getNature();
                 if (natureList.contains(NatureType.APPLICATION.getFullName())) {
                     log.debug(projectDirectory + " is an IIB Application");
                     ret = ProjectType.APPLICATION;

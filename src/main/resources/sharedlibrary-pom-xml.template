@@ -4,7 +4,7 @@
 	<groupId><<groupId>></groupId>
 	<artifactId><<artifactId>></artifactId>
 	<version><<version>></version>
-	<packaging>iib-shlib-bar</packaging>
+	<packaging>iib-bar</packaging>
 
 	<profiles>
 		<profile>

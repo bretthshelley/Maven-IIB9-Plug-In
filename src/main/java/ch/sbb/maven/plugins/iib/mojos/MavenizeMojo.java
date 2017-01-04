@@ -27,7 +27,7 @@ import ch.sbb.maven.plugins.iib.utils.PomXmlUtils;
 /**
  * This Mojo looks into the directory from which maven is run and attempts to "mavenize" the
  * library projects embedded in the execution root directory - that is, the directory from which this
- * goal is being executed. Each iib9 library project is given a pom.xml file
+ * goal is being executed. Each iib library, shared library and application project is given a pom.xml file
  * and a parent pom.xml containing modules is created.
  * 
  * 
@@ -54,13 +54,11 @@ public class MavenizeMojo extends AbstractMojo {
     @Parameter(property = "distribution.repository", required = false, defaultValue = "http://www.vadosity.com:8081/nexus/content/repositories/snapshots/")
     protected String distributionRepository;
 
-
     /**
      * indicates whether existing pom.xml files should be overwritten
      */
     @Parameter(property = "overwrite", required = true, defaultValue = "true")
     protected Boolean overwrite = Boolean.FALSE;
-
 
     /**
      * The path of the workspace in which the projects are to be sought.
@@ -79,7 +77,6 @@ public class MavenizeMojo extends AbstractMojo {
      */
     @Parameter(property = "session", required = true, readonly = true)
     protected MavenSession session;
-
 
     /**
      * The Maven PluginManager Object
@@ -103,33 +100,45 @@ public class MavenizeMojo extends AbstractMojo {
         determineProjectDirectoryTypes();
 
         // / add a pom.xml to project if not already present
-        for (String libraryProject : projects.get(ProjectType.LIBRARY)) {
-            getLog().info("analyzing project dependencies for " + libraryProject);
-            createAndWritePom(libraryProject, ProjectType.LIBRARY);
+        if (null != projects.get(ProjectType.LIBRARY)) {
+            for (String libraryProject : projects.get(ProjectType.LIBRARY)) {
+                getLog().info("analyzing project dependencies for " + libraryProject);
+                createAndWritePom(libraryProject, ProjectType.LIBRARY);
+            }
         }
 
-        for (String shlibProj : projects.get(ProjectType.SHAREDLIBRARY)) {
-            getLog().info("analyzing project dependencies for " + shlibProj);
-            try {
-                makeCommonMavenDirectories(shlibProj);
-            } catch (IOException e) {
-                getLog().warn("unable to create common maven directories: " + e);
+        if (null != projects.get(ProjectType.JAVA)) {
+            for (String javaProject : projects.get(ProjectType.JAVA)) {
+                getLog().info("analyzing project dependencies for " + javaProject);
+                createAndWritePom(javaProject, ProjectType.JAVA);
             }
-            createAndWritePom(shlibProj, ProjectType.SHAREDLIBRARY);
         }
 
-        for (String applicationProject : projects.get(ProjectType.APPLICATION)) {
-            getLog().info("analyzing project dependencies for " + applicationProject);
-            try {
-                makeCommonMavenDirectories(applicationProject);
-            } catch (IOException e) {
-                getLog().warn("unable to create common maven directories: " + e);
+        if (null != projects.get(ProjectType.SHAREDLIBRARY)) {
+            for (String shlibProj : projects.get(ProjectType.SHAREDLIBRARY)) {
+                getLog().info("analyzing project dependencies for " + shlibProj);
+                try {
+                    makeCommonMavenDirectories(shlibProj);
+                } catch (IOException e) {
+                    getLog().warn("unable to create common maven directories: " + e);
+                }
+                createAndWritePom(shlibProj, ProjectType.SHAREDLIBRARY);
             }
-            createAndWritePom(applicationProject, ProjectType.APPLICATION);
+        }
+
+        if (null != projects.get(ProjectType.APPLICATION)) {
+            for (String applicationProject : projects.get(ProjectType.APPLICATION)) {
+                getLog().info("analyzing project dependencies for " + applicationProject);
+                try {
+                    makeCommonMavenDirectories(applicationProject);
+                } catch (IOException e) {
+                    getLog().warn("unable to create common maven directories: " + e);
+                }
+                createAndWritePom(applicationProject, ProjectType.APPLICATION);
+            }
         }
 
         createAndWriteParentPom();
-
     }
 
     /**
@@ -143,7 +152,8 @@ public class MavenizeMojo extends AbstractMojo {
         try {
             String pomContent = null;
             switch (type) {
-                case LIBRARY: {
+                case LIBRARY:
+                case JAVA: {
                     pomContent = PomXmlUtils.getLibaryPomText(groupId,
                             project,
                             version,
@@ -220,7 +230,18 @@ public class MavenizeMojo extends AbstractMojo {
     private void createAndWriteParentPom() throws MojoFailureException {
 
         try {
-            String pomContent = PomXmlUtils.getParentPomText(groupId, version, distributionRepository, projects.get(ProjectType.LIBRARY));
+            List<String> allProjs = new ArrayList<String>();
+            List<ProjectType> types = new ArrayList<ProjectType>();
+            types.add(ProjectType.SHAREDLIBRARY);
+            types.add(ProjectType.APPLICATION);
+            types.add(ProjectType.LIBRARY);
+            types.add(ProjectType.JAVA);
+            for (ProjectType typ : types) {
+                if (null != projects.get(typ)) {
+                    allProjs.addAll(projects.get(typ));
+                }
+            }
+            String pomContent = PomXmlUtils.getParentPomText(groupId, version, distributionRepository, allProjs);
             // / write the pom.xml for the project
             File pomXml = new File(workspace, "pom.xml");
             if (pomXml.exists() && overwrite.equals(Boolean.FALSE)) {
@@ -269,16 +290,19 @@ public class MavenizeMojo extends AbstractMojo {
         String[] dependentProjectNames = EclipseProjectUtils.getDependentProjectNames(projectDirectory);
         for (String dependentProjectName : dependentProjectNames) {
 
-            getLog().info(projectDirectory.getName() + " has dependency " + dependentProjectName + "; checking for directory " + dependentProjectName + " in workspace");
+            getLog().info(projectDirectory.getName() + " has dependency " + dependentProjectName + "; checking " + dependentProjectName);
 
             // / if the workspace has the dependent project name, then add to the present list
+            // Unless it is a shared library
             File dir = new File(workspace, dependentProjectName);
             if (dir.exists() && dir.isDirectory()) {
                 // if (!EclipseProjectUtils.isApplication(dir, getLog()))
                 // {
-                // / make the assumption that the groupId, version, and other attributes are identical
-                dependentProjectsInWS.add(dependentProjectName);
-                // }
+                if (null == projects.get(ProjectType.SHAREDLIBRARY) || !projects.get(ProjectType.SHAREDLIBRARY).contains(dependentProjectName)) {
+                    // / make the assumption that the groupId, version, and other attributes are identical
+                    dependentProjectsInWS.add(dependentProjectName);
+                    // }
+                }
 
             }
         }
@@ -288,20 +312,22 @@ public class MavenizeMojo extends AbstractMojo {
     private void determineProjectDirectoryTypes() throws MojoFailureException {
         List<String> projectDirectories = EclipseProjectUtils.getWorkspaceProjects(workspace);
         for (String projectDirectory : projectDirectories) {
+            getLog().debug("mavenize Processing: " + projectDirectory);
             File projectDir = new File(workspace, projectDirectory);
             ProjectType pt = EclipseProjUtils.getProjectType(projectDir, getLog());
             if (null == projects.get(pt)) {
                 List<String> projlist = new ArrayList<String>();
                 projlist.add(projectDirectory);
+                projects.put(pt, projlist);
             } else {
                 List<String> projlist = projects.get(pt);
                 projlist.add(projectDirectory);
             }
         }
-
-        String message = projects.get(ProjectType.LIBRARY).size() + " library projects found in workspace; ";
-        message += projects.get(ProjectType.SHAREDLIBRARY).size() + " shared librray projects found in workspace; ";
-        message += projects.get(ProjectType.APPLICATION).size() + " application projects found in workspace";
+        String message = "Projects in workspace: " + projects.toString();
+        // String message = projects.get(ProjectType.LIBRARY).size() + " library projects found in workspace; ";
+        // message += projects.get(ProjectType.SHAREDLIBRARY).size() + " shared librray projects found in workspace; ";
+        // message += projects.get(ProjectType.APPLICATION).size() + " application projects found in workspace";
         getLog().info(message);
     }
 
