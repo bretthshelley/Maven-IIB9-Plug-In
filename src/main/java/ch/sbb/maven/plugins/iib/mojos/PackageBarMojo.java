@@ -72,7 +72,7 @@ public class PackageBarMojo extends AbstractMojo {
     protected boolean mqsiCreateBarDeployAsSource;
 
     @Parameter
-    protected boolean mqsiCreateBarCleanBuild;
+    protected boolean mqsiCreateBarNoCleanBuild;
 
     /**
      * The name of the BAR (compressed file format) archive file where the
@@ -206,7 +206,7 @@ public class PackageBarMojo extends AbstractMojo {
         }
         params.add(project.getName());
 
-        if (mqsiCreateBarCleanBuild) {
+        if (!mqsiCreateBarNoCleanBuild) {
             params.add("-cleanBuild");
         }
 
