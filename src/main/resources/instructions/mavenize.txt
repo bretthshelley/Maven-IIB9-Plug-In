@@ -9,6 +9,6 @@
 	-Diib.workspace=C:\Users\Brett\IBM\IntegrationToolkit90\testworkspace  
 	-Diib.distribution.repository=http://www.vadosity.com:8081/nexus/content/repositories/snapshots/
 	-Dmaven.multiModuleProjectDirectory=%M2_HOME%
-	ch.sbb.maven.plugins:iib-maven-plugin:9.0-SNAPSHOT:mavenize
+	ch.sbb.maven.plugins:iib-maven-plugin:10.0-SNAPSHOT:mavenize
 	
 	Note:  The iib.distribution.repository argument should match your local maven distribution repository. 
