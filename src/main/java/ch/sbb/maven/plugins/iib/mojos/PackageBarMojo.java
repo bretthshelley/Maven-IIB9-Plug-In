@@ -68,9 +68,11 @@ public class PackageBarMojo extends AbstractMojo {
     @Parameter(property = "mqsiCreateBarCompileOnlyReplacementCommand", required = false, defaultValue = "")
     protected String mqsiCreateBarCompileOnlyReplacementCommand;
 
-
     @Parameter
     protected boolean mqsiCreateBarDeployAsSource;
+
+    @Parameter
+    protected boolean mqsiCreateBarCleanBuild;
 
     /**
      * The name of the BAR (compressed file format) archive file where the
@@ -126,8 +128,9 @@ public class PackageBarMojo extends AbstractMojo {
         dependenciesManager = new DependenciesManager(project, workspace, getLog());
         List<String> params = new ArrayList<String>();
 
-        params.add("-k");
-        params.add(dependenciesManager.getApp());
+        // Not needed in IIB10
+        // params.add("-k");
+        // params.add(dependenciesManager.getApp());
 
         // if there are applications, add them
         if (!dependenciesManager.getDependentApps().isEmpty()) {
@@ -139,7 +142,6 @@ public class PackageBarMojo extends AbstractMojo {
             // instead of adding the dependent libraries ( which don't make it into the appzip - fix the
             // indirect references problem by altering the project's .project file
 
-
             try {
                 dependenciesManager.fixIndirectLibraryReferences(project.getBasedir());
             } catch (Exception e) {
@@ -147,6 +149,7 @@ public class PackageBarMojo extends AbstractMojo {
                 throw new MojoFailureException("problem fixing Indirect Library References", e);
             }
 
+            // Not needed in IIB10
             // params.add("-y");
             // params.addAll(dependenciesManager.getDependentLibs());
         }
@@ -203,7 +206,9 @@ public class PackageBarMojo extends AbstractMojo {
         }
         params.add(project.getName());
 
-        params.add("-cleanBuild");
+        if (mqsiCreateBarCleanBuild) {
+            params.add("-cleanBuild");
+        }
 
         if (mqsiCreateBarDeployAsSource) {
             params.add("-deployAsSource");
