@@ -51,6 +51,7 @@ public class ValidateBarBuildWorkspaceMojo extends AbstractMojo {
     protected File workspace;
 
 
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (new SkipUtil().isSkip(this.getClass())) {
             return;
@@ -59,36 +60,39 @@ public class ValidateBarBuildWorkspaceMojo extends AbstractMojo {
         // loop through the project directories
         File[] projects = workspace.listFiles();
 
-        for (File projectDirectory : projects) {
+        if (null == projects || 0 == projects.length) {
+            getLog().info("no projects in the workspace to validate.");
+        } else {
 
-            if (!projectDirectory.isDirectory()) {
-                continue;
-            }
+            for (File projectDirectory : projects) {
 
-            String projectDirectoryName = projectDirectory.getName();
+                if (!projectDirectory.isDirectory()) {
+                    continue;
+                }
 
-            if (projectDirectoryName.startsWith("."))
-            {
-                getLog().info("ignoring the directory " + projectDirectoryName + " in the workspace.");
-                continue;
-            }
+                String projectDirectoryName = projectDirectory.getName();
 
-            // / ignore any directory that doesn not have a .project file in it
-            File dotProjectFile = new File(projectDirectory, ".project");
-            if (!dotProjectFile.exists())
-            {
-                getLog().info("The project directory " + projectDirectory.getName() + " does not have a .project file associated with it. skipping verification...");
-                continue;
-            }
+                if (projectDirectoryName.startsWith(".")) {
+                    getLog().info("ignoring the directory " + projectDirectoryName + " in the workspace.");
+                    continue;
+                }
 
-
-            // checks that the directory name is the same as the name in the .project file
-            getLog().info("verifying that the directory " + projectDirectory + " has a .project file with the " + projectDirectory + " name");
+                // / ignore any directory that doesn not have a .project file in it
+                File dotProjectFile = new File(projectDirectory, ".project");
+                if (!dotProjectFile.exists()) {
+                    getLog().info("The project directory " + projectDirectory.getName() + " does not have a .project file associated with it. skipping verification...");
+                    continue;
+                }
 
 
-            String eclipseProjectName = EclipseProjectUtils.getProjectName(projectDirectory);
-            if (!projectDirectoryName.equals(eclipseProjectName)) {
-                throw new MojoFailureException("The Project Directory Name ('" + projectDirectoryName + "') is not the same as the Project Name (in .project file) ('" + eclipseProjectName + "')");
+                // checks that the directory name is the same as the name in the .project file
+                getLog().info("verifying that the directory " + projectDirectory + " has a .project file with the " + projectDirectory + " name");
+
+
+                String eclipseProjectName = EclipseProjectUtils.getProjectName(projectDirectory);
+                if (!projectDirectoryName.equals(eclipseProjectName)) {
+                    throw new MojoFailureException("The Project Directory Name ('" + projectDirectoryName + "') is not the same as the Project Name (in .project file) ('" + eclipseProjectName + "')");
+                }
             }
         }
     }
