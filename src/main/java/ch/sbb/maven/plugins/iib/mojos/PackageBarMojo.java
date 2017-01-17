@@ -74,6 +74,10 @@ public class PackageBarMojo extends AbstractMojo {
     @Parameter
     protected boolean mqsiCreateBarNoCleanBuild;
 
+    // Used to prevent the requesting on dependencies which are local
+    @Parameter
+    protected boolean iibDependenciesLocal;
+
     /**
      * The name of the BAR (compressed file format) archive file where the
      * result is stored.
@@ -120,12 +124,14 @@ public class PackageBarMojo extends AbstractMojo {
     protected BuildPluginManager buildPluginManager;
 
 
-    DependenciesManager dependenciesManager;
+    DependenciesManager dependenciesManager = null;
 
 
     private List<String> getApplicationAndLibraryParams() throws MojoFailureException {
 
-        dependenciesManager = new DependenciesManager(project, workspace, getLog());
+        if (!iibDependenciesLocal) {
+            dependenciesManager = new DependenciesManager(project, workspace, getLog());
+        }
         List<String> params = new ArrayList<String>();
 
         // Not needed in IIB10
@@ -133,12 +139,12 @@ public class PackageBarMojo extends AbstractMojo {
         // params.add(dependenciesManager.getApp());
 
         // if there are applications, add them
-        if (!dependenciesManager.getDependentApps().isEmpty()) {
+        if (!iibDependenciesLocal && !dependenciesManager.getDependentApps().isEmpty()) {
             params.addAll(dependenciesManager.getDependentApps());
         }
 
         // if there are libraries, add them
-        if (!dependenciesManager.getDependentLibs().isEmpty()) {
+        if (!iibDependenciesLocal && !dependenciesManager.getDependentLibs().isEmpty()) {
             // instead of adding the dependent libraries ( which don't make it into the appzip - fix the
             // indirect references problem by altering the project's .project file
 
@@ -259,6 +265,7 @@ public class PackageBarMojo extends AbstractMojo {
 
         } finally {
             util.restorePomFiles(workspace, getLog());
+            getLog().info("pom.xml was not renamed");
         }
 
     }

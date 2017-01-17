@@ -200,12 +200,13 @@ However, once your project is setup correctly, one should only need to run the c
 <h4><a name="MavenizeYourWorkspace">Mavenize Your Workspace</a></h4>
 <p>This plug-in can &quot;mavenize&quot; an entire IIB workspace in a few seconds. &nbsp;IIB projects get 'mavenized' by adding a pom.xml file in each project's root directory. And the pom.xml files contain maven dependency references that mirror IIB project dependencies. &nbsp;Also, mavenizing an IIB application project includes adding directories such as &quot;src\main\resources&quot; and &quot;src\test\resources&quot;. &nbsp;These directories facilititate bar overrides and bar deployments with property files and broker files respectively.  The <tt>mavenize</tt> goal in the IIB Maven plug-in enables these pom.xml files to be automatically generated with a working configuration. </p>
 <p>The simplest way to mavenize a workspace is to run maven at the root of your workspace with the command:
-<pre><b>mvn -Doverwrite=true -DgroupId=&lt;enter.your.group.id&gt; -Dversion=1.0-SNAPSHOT  -Dmaven.multiModuleProjectDirectory=%M2_HOME% -Ddistribution.repository=http://www.vadosity.com:8081/nexus/content/repositories/snapshots/ -Dworkspace=&lt;enter\path\to\your\iib9\workspace&gt; ch.sbb.maven.plugins:iib-maven-plugin:10.0-SNAPSHOT:mavenize
+<pre><b>mvn -Doverwrite=true -Dmqsiprofile=&lt;full.mqsiprofile.path&gt; -DgroupId=&lt;enter.your.group.id&gt; -Dversion=1.0-SNAPSHOT  -Dmaven.multiModuleProjectDirectory=%M2_HOME% -Ddistribution.repository=&lt;your.maven.repository&gt; -Dworkspace=&lt;enter\path\to\your\iib\workspace&gt; ch.sbb.maven.plugins:iib-maven-plugin:10.0-SNAPSHOT:mavenize
 </b></pre>
 
 The <tt>mavenize</tt> goal has the following configuration parameters:</p>
 <ul>
   <li><tt>overwrite</tt> - true or false value indicating whether existing pom.xml files should be overwritten, defaults to true</li>
+  <li><tt>mqsiprofile</tt> - fill path to the mqsiprofile, such as /opt/ibm/iib-10.0.0.6/server/bin/mqsiprofile</li>
   <li><tt>groupId</tt> - the groupId of the maven artifacts, defaults to org.yourorg.yourteam</li>
   <li><tt>distribution.repository</tt> - the url to the repository where the artifacts (bar files, zip files) get deployed, defaults to <a href="http://www.vadosity.com:8081/nexus/content/repositories/snapshots/">http://www.vadosity.com:8081/nexus/content/repositories/snapshots/</a> </li>
   <li><tt>workspace</tt> - the location of the IIB workspace, defaults to present working directory</li>

@@ -1,109 +1,108 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId><<groupId>></groupId>
-	<artifactId><<artifactId>></artifactId>
-	<version><<version>></version>
-	<packaging>iib-bar</packaging>
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId><<groupId>></groupId>
+    <artifactId><<artifactId>></artifactId>
+    <version><<version>></version>
+    <packaging>iib-bar</packaging>
 
-	<profiles>
-		<profile>
-			<id>localdev</id>
-			<activation>
-      			<activeByDefault>true</activeByDefault>
-    		</activation>
-			<properties>
-				<workspace><<workspace>></workspace>
-				<initialDeletes>**/*.jar</initialDeletes>
-				<unpackIibDependenciesIntoWorkspace>true</unpackIibDependenciesIntoWorkspace>
-				<pathToMqsiProfileScript>C:\Program Files\IBM\MQSI\10.0.0.6\bin\mqsiprofile.cmd</pathToMqsiProfileScript>
-				<failOnInvalidProperties>true</failOnInvalidProperties>
-				<useClassloaders>false</useClassloaders>
-				<failOnInvalidClassloader>true</failOnInvalidClassloader>
-				<createOrPackageBar>package</createOrPackageBar>
-				<completeDeployment>true</completeDeployment>
-				<timeoutSecs>600</timeoutSecs>
-				<integrationServerName>default</integrationServerName>			
-			</properties>		
-		</profile>	
-	</profiles>
-	
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>ch.sbb.maven.plugins</groupId>
-				<artifactId>iib-maven-plugin</artifactId>
-				<version>10.0-SNAPSHOT</version>
-				<extensions>true</extensions>
-				<configuration>
-					<workspace>${workspace}</workspace>
-					<initialDeletes>${initialDeletes}</initialDeletes>
-					<unpackIibDependenciesIntoWorkspace>${unpackIibDependenciesIntoWorkspace}</unpackIibDependenciesIntoWorkspace>
-					<pathToMqsiProfileScript>${pathToMqsiProfileScript}</pathToMqsiProfileScript>
-					<failOnInvalidProperties>${failOnInvalidProperties}</failOnInvalidProperties>
-					<useClassloaders>${useClassloaders}</useClassloaders>
-					<failOnInvalidClassloader>${failOnInvalidClassloader}</failOnInvalidClassloader>
-					<createOrPackageBar>${createOrPackageBar}</createOrPackageBar>
-					<!-- mqsideploy -n b1.broker -e default -a mybar.bar -m -w 600 -->					
-					<completeDeployment>${completeDeployment}</completeDeployment>
-					<timeoutSecs>${timeoutSecs}</timeoutSecs>
-					<integrationServerName>${integrationServerName}</integrationServerName>
-					<!-- if timeouts occur on broker, then try command:  mqsichangebroker IB9NODE -g 300 -k 300 -->
-					<!-- to enable/disable decision services:  mqsimode IB9Node -x DecisionServices  -->
-				</configuration>
-			</plugin>
-		</plugins>
+    <profiles>
+        <profile>
+            <id>localdev</id>
+            <activation>
+                  <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <workspace><<workspace>></workspace>
+                <initialDeletes>**/*.jar</initialDeletes>
+                <unpackIibDependenciesIntoWorkspace>false</unpackIibDependenciesIntoWorkspace>
+                <pathToMqsiProfileScript><<mqsiprofile>></pathToMqsiProfileScript>
+                <failOnInvalidProperties>true</failOnInvalidProperties>
+                <useClassloaders>false</useClassloaders>
+                <failOnInvalidClassloader>true</failOnInvalidClassloader>
+                <createOrPackageBar>create</createOrPackageBar>
+                <completeDeployment>true</completeDeployment>
+                <timeoutSecs>600</timeoutSecs>
+                <mqsiCreateBarDeployAsSource>true</mqsiCreateBarDeployAsSource>                
+            </properties>        
+        </profile>    
+    </profiles>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>ch.sbb.maven.plugins</groupId>
+                <artifactId>iib-maven-plugin</artifactId>
+                <version>10.0-SNAPSHOT</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <workspace>${workspace}</workspace>
+                    <initialDeletes>${initialDeletes}</initialDeletes>
+                    <unpackIibDependenciesIntoWorkspace>${unpackIibDependenciesIntoWorkspace}</unpackIibDependenciesIntoWorkspace>
+                    <pathToMqsiProfileScript>${pathToMqsiProfileScript}</pathToMqsiProfileScript>
+                    <failOnInvalidProperties>${failOnInvalidProperties}</failOnInvalidProperties>
+                    <useClassloaders>${useClassloaders}</useClassloaders>
+                    <failOnInvalidClassloader>${failOnInvalidClassloader}</failOnInvalidClassloader>
+                    <createOrPackageBar>${createOrPackageBar}</createOrPackageBar>
+                    <!-- mqsideploy -n b1.broker -e default -a mybar.bar -m -w 600 -->                    
+                    <completeDeployment>${completeDeployment}</completeDeployment>
+                    <timeoutSecs>${timeoutSecs}</timeoutSecs>
+                    <!-- if timeouts occur on broker, then try command:  mqsichangebroker IB9NODE -g 300 -k 300 -->
+                    <!-- to enable/disable decision services:  mqsimode IB9Node -x DecisionServices  -->
+                    <mqsiCreateBarDeployAsSource>${mqsiCreateBarDeployAsSource}</mqsiCreateBarDeployAsSource>                    
+                </configuration>
+            </plugin>
+        </plugins>
 
-		<pluginManagement>
-			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-											ch.sbb.maven.plugins
-										</groupId>
-										<artifactId>
-											iib-maven-plugin
-										</artifactId>
-										<versionRange>
-											[10.0-SNAPSHOT,)
-										</versionRange>
-										<goals>
-											<goal>
-												initialize-bar-build-workspace
-											</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
+        <pluginManagement>
+            <plugins>
+                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>
+                                            ch.sbb.maven.plugins
+                                        </groupId>
+                                        <artifactId>
+                                            iib-maven-plugin
+                                        </artifactId>
+                                        <versionRange>
+                                            [10.0-SNAPSHOT,)
+                                        </versionRange>
+                                        <goals>
+                                            <goal>
+                                                initialize-bar-build-workspace
+                                            </goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore></ignore>
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 
-	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.11</version>
-			<scope>test</scope>
-		</dependency> 
-	</dependencies>
-		
-		<!-- NOTE:  The Integration Test FailSafe plugin looks for Test classes that follow the **/*IT.java, **/*ITCase.java, or **/IT*.java pattern -->
-		
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+            <scope>test</scope>
+        </dependency> 
+    </dependencies>
+        
+    <!-- NOTE:  The Integration Test FailSafe plugin looks for Test classes that follow the **/*IT.java, **/*ITCase.java, or **/IT*.java pattern -->
 
 <<distributionRepositoryText>>
 

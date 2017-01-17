@@ -120,8 +120,16 @@ public class PomXmlUtils {
     }
 
 
-    public static String getSharedLibraryPomText(File workspace, String groupId, String artifactId, String version, String distributionRepository, String[] dependentProjects) throws IOException {
-        String content = getSharedLibraryPomTemplate();
+    public static String getSharedLibraryPomText(File workspace, String groupId, String artifactId, String version, String distributionRepository, String[] dependentProjects, String mqsiprofile,
+            Boolean depsLocal)
+            throws IOException {
+
+        String content;
+        if (depsLocal) {
+            content = getSharedLibraryDepsLocalPomTemplate();
+        } else {
+            content = getSharedLibraryPomTemplate();
+        }
         content = replaceAll(content, "<<workspace>>", workspace.getAbsolutePath());
         String groupIdRegex = Pattern.quote("<<groupId>>");
         content = content.replaceAll(groupIdRegex, groupId);
@@ -129,6 +137,8 @@ public class PomXmlUtils {
         content = content.replaceAll(artifactIdRegex, artifactId);
         String versionRegex = Pattern.quote("<<version>>");
         content = content.replaceAll(versionRegex, version);
+        String mqsiprofileRegex = Pattern.quote("<<mqsiprofile>>");
+        content = content.replaceAll(mqsiprofileRegex, mqsiprofile);
 
         if (dependentProjects != null && dependentProjects.length > 0) {
             String dependenciesMarker = "<dependencies>";
@@ -154,11 +164,16 @@ public class PomXmlUtils {
         return content;
     }
 
-    public static String getApplicationPomText(File workspace, String groupId, String artifactId, String version, String distributionRepository, String[] dependentProjects) throws IOException {
-        String content = getApplicationPomTemplate();
-        // String workspaceRegex = Pattern.quote("<<workspace>>");
+    public static String getApplicationPomText(File workspace, String groupId, String artifactId, String version, String distributionRepository, String[] dependentProjects, String mqsiprofile,
+            Boolean depsLocal)
+            throws IOException {
+        String content;
+        if (depsLocal) {
+            content = getApplicationDepsLocalPomTemplate();
+        } else {
+            content = getApplicationPomTemplate();
 
-
+        }
         content = replaceAll(content, "<<workspace>>", workspace.getAbsolutePath());
         String groupIdRegex = Pattern.quote("<<groupId>>");
         content = content.replaceAll(groupIdRegex, groupId);
@@ -166,6 +181,8 @@ public class PomXmlUtils {
         content = content.replaceAll(artifactIdRegex, artifactId);
         String versionRegex = Pattern.quote("<<version>>");
         content = content.replaceAll(versionRegex, version);
+        String mqsiprofileRegex = Pattern.quote("<<mqsiprofile>>");
+        content = content.replaceAll(mqsiprofileRegex, mqsiprofile);
 
         if (dependentProjects != null && dependentProjects.length > 0) {
             String dependenciesMarker = "<dependencies>";
@@ -232,8 +249,16 @@ public class PomXmlUtils {
         return getTemplateText("application-pom-xml.template");
     }
 
+    public static String getApplicationDepsLocalPomTemplate() throws IOException {
+        return getTemplateText("application-depslocal-pom-xml.template");
+    }
+
     public static String getSharedLibraryPomTemplate() throws IOException {
         return getTemplateText("sharedlibrary-pom-xml.template");
+    }
+
+    public static String getSharedLibraryDepsLocalPomTemplate() throws IOException {
+        return getTemplateText("sharedlibrary-depslocal-pom-xml.template");
     }
 
     public static String getSingleDependencyTemplate() throws IOException {

@@ -15,7 +15,7 @@
             <properties>
                 <workspace><<workspace>></workspace>
                 <initialDeletes>**/*.jar</initialDeletes>
-                <unpackIibDependenciesIntoWorkspace>true</unpackIibDependenciesIntoWorkspace>
+                <unpackIibDependenciesIntoWorkspace>false</unpackIibDependenciesIntoWorkspace>
                 <pathToMqsiProfileScript><<mqsiprofile>></pathToMqsiProfileScript>
                 <failOnInvalidProperties>true</failOnInvalidProperties>
                 <useClassloaders>false</useClassloaders>
@@ -23,7 +23,8 @@
                 <createOrPackageBar>create</createOrPackageBar>
                 <completeDeployment>true</completeDeployment>
                 <timeoutSecs>600</timeoutSecs>
-                <mqsiCreateBarDeployAsSource>true</mqsiCreateBarDeployAsSource>    
+                <mqsiCreateBarDeployAsSource>true</mqsiCreateBarDeployAsSource>   
+                <iibDependenciesLocal>true</iibDependenciesLocal>
             </properties>        
         </profile>    
     </profiles>
@@ -50,7 +51,8 @@
                     <timeoutSecs>${timeoutSecs}</timeoutSecs>
                     <!-- if timeouts occur on broker, then try command:  mqsichangebroker IB9NODE -g 300 -k 300 -->
                     <!-- to enable/disable decision services:  mqsimode IB9Node -x DecisionServices  -->
-                    <mqsiCreateBarDeployAsSource>${mqsiCreateBarDeployAsSource}</mqsiCreateBarDeployAsSource>    
+                    <mqsiCreateBarDeployAsSource>true</mqsiCreateBarDeployAsSource>    
+                    <iibDependenciesLocal>${iibDependenciesLocal}</iibDependenciesLocal>
                 </configuration>
             </plugin>
         </plugins>

@@ -61,10 +61,22 @@ public class MavenizeMojo extends AbstractMojo {
     protected Boolean overwrite = Boolean.FALSE;
 
     /**
+     * mqsiprofile path
+     */
+    @Parameter(property = "mqsiprofile", required = false, defaultValue = "C:\\Program Files\\IBM\\IIB\\10.0.0.6\\server\\bin\\mqsiprofile.cmd")
+    protected String mqsiprofile;
+    /**
      * The path of the workspace in which the projects are to be sought.
      */
     @Parameter(property = "workspace", required = false)
     protected File workspace;
+
+    /**
+     * iibDependenciesLocal flag is used to define whether iib dependencies are local or added to the repo
+     */
+    @Parameter(property = "iibDependenciesLocal", required = false, defaultValue = "false")
+    protected boolean iibDependenciesLocal;
+
     //
     // /**
     // * The Maven Project Object
@@ -90,6 +102,8 @@ public class MavenizeMojo extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         validateWorkspaceIfSet();
         validateGroupIdAndVersion();
+        validateMQSIprofile();
+
 
         if (workspace == null) {
             String root = session.getExecutionRootDirectory();
@@ -100,14 +114,14 @@ public class MavenizeMojo extends AbstractMojo {
         determineProjectDirectoryTypes();
 
         // / add a pom.xml to project if not already present
-        if (null != projects.get(ProjectType.LIBRARY)) {
+        if (!iibDependenciesLocal && null != projects.get(ProjectType.LIBRARY)) {
             for (String libraryProject : projects.get(ProjectType.LIBRARY)) {
                 getLog().info("analyzing project dependencies for " + libraryProject);
                 createAndWritePom(libraryProject, ProjectType.LIBRARY);
             }
         }
 
-        if (null != projects.get(ProjectType.JAVA)) {
+        if (!iibDependenciesLocal && null != projects.get(ProjectType.JAVA)) {
             for (String javaProject : projects.get(ProjectType.JAVA)) {
                 getLog().info("analyzing project dependencies for " + javaProject);
                 createAndWritePom(javaProject, ProjectType.JAVA);
@@ -148,7 +162,10 @@ public class MavenizeMojo extends AbstractMojo {
      */
     private void createAndWritePom(String project, ProjectType type) throws MojoFailureException {
         File projectDirectory = new File(workspace, project);
-        String[] dependentProjectNames = determineDependentProjectsInWorkspace(projectDirectory);
+        String[] dependentProjectNames = new String[0];
+        if (!iibDependenciesLocal) {
+            dependentProjectNames = determineDependentProjectsInWorkspace(projectDirectory);
+        }
         try {
             String pomContent = null;
             switch (type) {
@@ -166,7 +183,7 @@ public class MavenizeMojo extends AbstractMojo {
                             project,
                             version,
                             distributionRepository,
-                            dependentProjectNames);
+                            dependentProjectNames, mqsiprofile, iibDependenciesLocal);
                     break;
                 }
                 case APPLICATION: {
@@ -174,7 +191,7 @@ public class MavenizeMojo extends AbstractMojo {
                             project,
                             version,
                             distributionRepository,
-                            dependentProjectNames);
+                            dependentProjectNames, mqsiprofile, iibDependenciesLocal);
                     break;
                 }
             }
@@ -232,10 +249,12 @@ public class MavenizeMojo extends AbstractMojo {
         try {
             List<String> allProjs = new ArrayList<String>();
             List<ProjectType> types = new ArrayList<ProjectType>();
+            if (!iibDependenciesLocal) {
+                types.add(ProjectType.LIBRARY);
+                types.add(ProjectType.JAVA);
+            }
             types.add(ProjectType.SHAREDLIBRARY);
             types.add(ProjectType.APPLICATION);
-            types.add(ProjectType.LIBRARY);
-            types.add(ProjectType.JAVA);
             for (ProjectType typ : types) {
                 if (null != projects.get(typ)) {
                     allProjs.addAll(projects.get(typ));
@@ -358,6 +377,17 @@ public class MavenizeMojo extends AbstractMojo {
                     throw new MojoFailureException(message);
                 }
             }
+        }
+    }
+
+    /**
+     * Validates mqsiprofile
+     */
+    private void validateMQSIprofile() throws MojoFailureException {
+        File file_mqsiprofile = new File(mqsiprofile);
+        if (!file_mqsiprofile.exists() || !file_mqsiprofile.canExecute()) {
+            String message = "The defined mqsiprofile, '" + mqsiprofile + "', needs to be a valid executable script.";
+            throw new MojoFailureException(message);
         }
     }
 
