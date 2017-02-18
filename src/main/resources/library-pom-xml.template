@@ -12,7 +12,7 @@
 			<plugin>
 				<groupId>ch.sbb.maven.plugins</groupId>
 				<artifactId>iib-maven-plugin</artifactId>
-				<version>9.0-SNAPSHOT</version>
+				<version>10.0-SNAPSHOT</version>
 				<extensions>true</extensions>
 				<configuration>
 				</configuration>
@@ -38,7 +38,7 @@
 											iib-maven-plugin
 										</artifactId>
 										<versionRange>
-											[9.0-SNAPSHOT,)
+											[10.0-SNAPSHOT,)
 										</versionRange>
 										<goals>
 											<goal>

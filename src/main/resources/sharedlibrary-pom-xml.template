@@ -15,7 +15,7 @@
             <properties>
                 <workspace><<workspace>></workspace>
                 <initialDeletes>**/*.jar</initialDeletes>
-                <unpackIibDependenciesIntoWorkspace>true</unpackIibDependenciesIntoWorkspace>
+                <unpackIibDependenciesIntoWorkspace>false</unpackIibDependenciesIntoWorkspace>
                 <pathToMqsiProfileScript><<mqsiprofile>></pathToMqsiProfileScript>
                 <failOnInvalidProperties>true</failOnInvalidProperties>
                 <useClassloaders>false</useClassloaders>
@@ -23,11 +23,10 @@
                 <createOrPackageBar>create</createOrPackageBar>
                 <completeDeployment>true</completeDeployment>
                 <timeoutSecs>600</timeoutSecs>
-                <mqsiCreateBarDeployAsSource>true</mqsiCreateBarDeployAsSource>    
+                <mqsiCreateBarDeployAsSource>true</mqsiCreateBarDeployAsSource>                
             </properties>        
         </profile>    
     </profiles>
-    
     
     <build>
         <plugins>
@@ -50,7 +49,7 @@
                     <timeoutSecs>${timeoutSecs}</timeoutSecs>
                     <!-- if timeouts occur on broker, then try command:  mqsichangebroker IB9NODE -g 300 -k 300 -->
                     <!-- to enable/disable decision services:  mqsimode IB9Node -x DecisionServices  -->
-                    <mqsiCreateBarDeployAsSource>${mqsiCreateBarDeployAsSource}</mqsiCreateBarDeployAsSource>    
+                    <mqsiCreateBarDeployAsSource>${mqsiCreateBarDeployAsSource}</mqsiCreateBarDeployAsSource>                    
                 </configuration>
             </plugin>
         </plugins>
@@ -104,7 +103,6 @@
     </dependencies>
         
     <!-- NOTE:  The Integration Test FailSafe plugin looks for Test classes that follow the **/*IT.java, **/*ITCase.java, or **/IT*.java pattern -->
-        
 
 <<distributionRepositoryText>>
 

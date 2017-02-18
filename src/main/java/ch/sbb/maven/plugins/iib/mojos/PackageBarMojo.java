@@ -21,13 +21,15 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.FileUtils;
 
+import com.ibm.broker.config.appdev.CommandProcessorPublicWrapper;
+import com.syntegrity.iib.EclipseProjUtils;
+import com.syntegrity.iib.ProjectType;
+
 import ch.sbb.maven.plugins.iib.utils.DependenciesManager;
 import ch.sbb.maven.plugins.iib.utils.DirectoriesUtil;
 import ch.sbb.maven.plugins.iib.utils.MqsiCommand;
 import ch.sbb.maven.plugins.iib.utils.MqsiCommandLauncher;
 import ch.sbb.maven.plugins.iib.utils.SkipUtil;
-
-import com.ibm.broker.config.appdev.CommandProcessorPublicWrapper;
 
 
 /**
@@ -66,6 +68,15 @@ public class PackageBarMojo extends AbstractMojo {
     @Parameter(property = "mqsiCreateBarCompileOnlyReplacementCommand", required = false, defaultValue = "")
     protected String mqsiCreateBarCompileOnlyReplacementCommand;
 
+    @Parameter
+    protected boolean mqsiCreateBarDeployAsSource;
+
+    @Parameter
+    protected boolean mqsiCreateBarNoCleanBuild;
+
+    // Used to prevent the requesting on dependencies which are local
+    @Parameter
+    protected boolean iibDependenciesLocal;
 
     /**
      * The name of the BAR (compressed file format) archive file where the
@@ -113,28 +124,29 @@ public class PackageBarMojo extends AbstractMojo {
     protected BuildPluginManager buildPluginManager;
 
 
-    DependenciesManager dependenciesManager;
+    DependenciesManager dependenciesManager = null;
 
 
     private List<String> getApplicationAndLibraryParams() throws MojoFailureException {
 
-        dependenciesManager = new DependenciesManager(project, workspace, getLog());
+        if (!iibDependenciesLocal) {
+            dependenciesManager = new DependenciesManager(project, workspace, getLog());
+        }
         List<String> params = new ArrayList<String>();
 
-        params.add("-k");
-        params.add(dependenciesManager.getApp());
+        // Not needed in IIB10
+        // params.add("-k");
+        // params.add(dependenciesManager.getApp());
 
         // if there are applications, add them
-        if (!dependenciesManager.getDependentApps().isEmpty()) {
+        if (!iibDependenciesLocal && !dependenciesManager.getDependentApps().isEmpty()) {
             params.addAll(dependenciesManager.getDependentApps());
         }
 
         // if there are libraries, add them
-        if (!dependenciesManager.getDependentLibs().isEmpty())
-        {
+        if (!iibDependenciesLocal && !dependenciesManager.getDependentLibs().isEmpty()) {
             // instead of adding the dependent libraries ( which don't make it into the appzip - fix the
             // indirect references problem by altering the project's .project file
-
 
             try {
                 dependenciesManager.fixIndirectLibraryReferences(project.getBasedir());
@@ -143,6 +155,7 @@ public class PackageBarMojo extends AbstractMojo {
                 throw new MojoFailureException("problem fixing Indirect Library References", e);
             }
 
+            // Not needed in IIB10
             // params.add("-y");
             // params.addAll(dependenciesManager.getDependentLibs());
         }
@@ -190,12 +203,26 @@ public class PackageBarMojo extends AbstractMojo {
         params.add("-b");
         params.add(barName.getAbsolutePath());
 
-        params.add("-a");
+        File projectDir = new File(workspace, project.getName());
+        if (EclipseProjUtils.getProjectType(projectDir, getLog()) == ProjectType.APPLICATION) {
+            params.add("-a");
+        } else {
+            // else we assume shared library
+            params.add("-l");
+        }
         params.add(project.getName());
 
-        params.add("-cleanBuild");
+        if (!mqsiCreateBarNoCleanBuild) {
+            params.add("-cleanBuild");
+        }
 
-        params.addAll(getApplicationAndLibraryParams());
+        if (mqsiCreateBarDeployAsSource) {
+            params.add("-deployAsSource");
+        }
+
+        if (EclipseProjUtils.getProjectType(projectDir, getLog()) == ProjectType.APPLICATION) {
+            params.addAll(getApplicationAndLibraryParams());
+        }
 
         // always trace the packaging process
 
@@ -220,11 +247,9 @@ public class PackageBarMojo extends AbstractMojo {
      * @throws MojoFailureException
      * @throws IOException
      */
-    private void executeMqsiCreateBar(List<String> params) throws MojoFailureException, IOException
-    {
+    private void executeMqsiCreateBar(List<String> params) throws MojoFailureException, IOException {
         DirectoriesUtil util = new DirectoriesUtil();
-        try
-        {
+        try {
             // / the better approach is simply to rename the pom.xml files as pom-xml-temp.txt
             // / and run maven with a "mvn [goal] -f pom.xml.txt"
             util.renamePomXmlFiles(workspace, getLog());
@@ -238,9 +263,9 @@ public class PackageBarMojo extends AbstractMojo {
                     mqsiCreateBarReplacementCommand);
 
 
-        } finally
-        {
+        } finally {
             util.restorePomFiles(workspace, getLog());
+            getLog().info("pom.xml was not renamed");
         }
 
     }
@@ -260,6 +285,7 @@ public class PackageBarMojo extends AbstractMojo {
         }
     }
 
+    @Override
     public void execute() throws MojoFailureException, MojoExecutionException {
         if (new SkipUtil().isSkip(this.getClass())) {
             return;
@@ -275,20 +301,16 @@ public class PackageBarMojo extends AbstractMojo {
             }
 
             List<String> params = null;
-            if (create)
-            {
+            if (create) {
                 getLog().info("Creating bar file: " + barName);
                 params = constructCreateBarParams();
                 executeMqsiCreateBar(params);
-            }
-            else
-            {
+            } else {
                 getLog().info("Packaging bar file: " + barName);
                 params = constructPackageBarParams();
                 executeMqsiPackageBar(params);
             }
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
 
             throw new MojoFailureException(e.toString());
         }
@@ -299,12 +321,10 @@ public class PackageBarMojo extends AbstractMojo {
      * @throws MojoFailureException
      * 
      */
-    private void validateConfig() throws MojoFailureException
-    {
+    private void validateConfig() throws MojoFailureException {
         String result = validateCreateOrPackageBar(createOrPackageBar, getLog());
         create = result.equals("create");
-        if (create)
-        {
+        if (create) {
             validatePathToMqsiProfileScript(pathToMqsiProfileScript, getLog());
 
         }
@@ -315,8 +335,7 @@ public class PackageBarMojo extends AbstractMojo {
     private void executeMqsiPackageBar(List<String> params) throws Exception {
 
         DirectoriesUtil util = new DirectoriesUtil();
-        try
-        {
+        try {
 
             executeCreateBarCompileOnly();
 
@@ -327,14 +346,12 @@ public class PackageBarMojo extends AbstractMojo {
 
             getLog().info("Packaging Bar File with the parameters: ");
             String[] paramsArray = params.toArray(new String[0]);
-            for (String param : paramsArray)
-            {
+            for (String param : paramsArray) {
                 getLog().info(param);
             }
             new CommandProcessorPublicWrapper(paramsArray).process();
 
-        } finally
-        {
+        } finally {
             util.restorePomFiles(workspace, getLog());
         }
 
@@ -352,8 +369,7 @@ public class PackageBarMojo extends AbstractMojo {
                 "Prior to Packaging Bar, it is necessary to compile and package the java archives in the workspace",
                 "Thus, msqicreatebar command will be executed in -compileonly mode"
         };
-        for (String message : messages)
-        {
+        for (String message : messages) {
             getLog().info(message);
         }
 
@@ -368,8 +384,7 @@ public class PackageBarMojo extends AbstractMojo {
 
         // / stick the dependent jars into the root of the application
         Collection<String> javaProjects = dependenciesManager.getDependentJavaProjects();
-        for (String javaProject : javaProjects)
-        {
+        for (String javaProject : javaProjects) {
             File javaProjectDir = new File(workspace, javaProject);
             File jar = new File(javaProjectDir, javaProject + ".jar");
             try {

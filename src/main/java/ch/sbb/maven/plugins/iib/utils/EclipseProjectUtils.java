@@ -11,6 +11,8 @@ import javax.xml.bind.Unmarshaller;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 
+import com.syntegrity.iib.NatureType;
+
 import ch.sbb.maven.plugins.iib.generated.eclipse_project.ProjectDescription;
 import ch.sbb.maven.plugins.iib.generated.eclipse_project.ProjectDescription.Projects;
 
@@ -52,13 +54,11 @@ public class EclipseProjectUtils {
             if (file.getName().equals(".metadata")) {
                 continue;
             }
-            if (file.getName().startsWith("."))
-            {
+            if (file.getName().startsWith(".")) {
                 continue;
             }
             File dotProjectFile = new File(file, ".project");
-            if (dotProjectFile.exists())
-            {
+            if (dotProjectFile.exists()) {
                 workspaceProjects.add(file.getName());
             }
 
@@ -86,8 +86,7 @@ public class EclipseProjectUtils {
         return getProjectDescription(projectDirectory).getName();
     }
 
-    public static String[] getDependentProjectNames(File projectDirectory) throws MojoFailureException
-    {
+    public static String[] getDependentProjectNames(File projectDirectory) throws MojoFailureException {
         Projects projects = getProjectDescription(projectDirectory).getProjects();
         List<String> projectNames = projects.getProject();
         if (projectNames == null || projectNames.isEmpty()) {
@@ -104,24 +103,20 @@ public class EclipseProjectUtils {
      * @throws MojoFailureException if something went wrong
      */
     public static boolean isApplication(File projectDirectory, Log log) throws MojoFailureException {
-        try
-        {
+        try {
             if (projectDirectory.getName().equalsIgnoreCase("BARFiles")) {
                 return false;
             }
 
-
             List<String> natureList = getProjectDescription(projectDirectory).getNatures().getNature();
-            if (natureList
-                    .contains("com.ibm.etools.msgbroker.tooling.applicationNature")) {
+            if (natureList.contains("com.ibm.etools.msgbroker.tooling.applicationNature")) {
                 log.debug(
                         projectDirectory + " is an IIB Application");
                 return true;
             } else {
                 return false;
             }
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             String message = "An error occurred trying to determine the nature of the eclipse project at " + projectDirectory.getAbsolutePath() + ".";
             message += "\n" + "The error was: " + e;
             message += "\n" + "Instead of allowing the build to fail, the EclipseProjectUtils.isApplication() method is returning false";
@@ -137,22 +132,20 @@ public class EclipseProjectUtils {
      * @throws MojoFailureException if something went wrong
      */
     public static boolean isLibrary(File projectDirectory, Log log) throws MojoFailureException {
-        try
-        {
+        try {
             if (projectDirectory.getName().equalsIgnoreCase("BARFiles")) {
                 return false;
             }
 
             List<String> natureList = getProjectDescription(projectDirectory).getNatures().getNature();
-            if (natureList
-                    .contains("com.ibm.etools.msgbroker.tooling.libraryNature")) {
+            if (natureList.contains(NatureType.LIBRARY.getFullName()) &&
+                    !natureList.contains(NatureType.SHAREDLIBRARY.getFullName())) {
                 log.debug(projectDirectory + " is an IIB Library");
                 return true;
             } else {
                 return false;
             }
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             String message = "An error occurred trying to determine the nature of the eclipse project at " + projectDirectory.getAbsolutePath() + ".";
             message += "\n" + "The error was: " + e;
             message += "\n" + "Instead of allowing the build to fail, the EclipseProjectUtils.isLibrary() method is returning false";
@@ -161,8 +154,7 @@ public class EclipseProjectUtils {
         }
     }
 
-    public static boolean isJavaProject(File projectDirectory, Log log)
-    {
+    public static boolean isJavaProject(File projectDirectory, Log log) {
         if (projectDirectory.getName().equalsIgnoreCase("BARFiles")) {
             return false;
         }
