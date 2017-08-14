@@ -3,6 +3,12 @@
  */
 package com.syntegrity.iib;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 
 import org.apache.maven.plugin.MojoFailureException;
@@ -10,7 +16,6 @@ import org.apache.maven.plugin.logging.Log;
 
 import com.devdaily.system.SystemCommandExecutor;
 
-import ch.sbb.maven.plugins.iib.utils.CommandParser;
 import ch.sbb.maven.plugins.iib.utils.MqsiCommand;
 import ch.sbb.maven.plugins.iib.utils.MqsiCommandLauncher;
 import ch.sbb.maven.plugins.iib.utils.TimeElapsedThread;
@@ -40,38 +45,35 @@ public class LinuxMqsiCommandLauncher extends MqsiCommandLauncher {
 
         final ArrayList<String> osCommands = new ArrayList<String>();
 
-        addMqsiSetProfileCommands(log, pathToMqsiProfileScript, mqsiPrefixCommands, osCommands);
+        addMqsiSetProfileCommands(log, osCommands);
+        String cmd = null;
 
-        String lastcmd = osCommands.get(osCommands.size() - 1);
-
-        StringBuilder sb = new StringBuilder(lastcmd);
-        sb.append(" ");
-        sb.append(mqsiCommand.toString());
-        for (String c : commands) {
-            sb.append(" ");
-            sb.append(c);
-        }
-        osCommands.set(osCommands.size() - 1, sb.toString());
-        logGeneratedCommands(log, osCommands);
+        // logGeneratedCommands(log, osCommands);
 
         // / now we check to see if the user has chosen to run a separate mqsiReplacement command to override the default command
         // if replacement commands are set, then we replace the commands with what has been entered
         // this gives the user an opportunity to 'tweak' the mqsi commands being run
 
         if (mqsiReplacementCommand != null && !mqsiReplacementCommand.trim().isEmpty()) {
-            osCommands.clear();
-            addMqsiSetProfileCommands(log, pathToMqsiProfileScript, mqsiPrefixCommands, osCommands);
-            String[] replacementCommands = new CommandParser().parseCommands(mqsiReplacementCommand);
-            for (String replacementCommand : replacementCommands) {
-                osCommands.add(replacementCommand);
+
+            cmd = mqsiReplacementCommand;
+
+        } else {
+            StringBuilder sb = new StringBuilder();
+            sb.append(mqsiCommand.toString());
+            for (String c : commands) {
+                sb.append(" ");
+                sb.append(c);
             }
-            logReplacementCommands(log, osCommands);
+            cmd = sb.toString();
         }
-
-        SystemCommandExecutor commandExecutor = new SystemCommandExecutor(osCommands);
-
-        TimeElapsedThread thread = new TimeElapsedThread(log);
         try {
+            File tf = createTempScript(pathToMqsiProfileScript, cmd);
+            osCommands.add(tf.getAbsolutePath());
+            logGeneratedCommands(log, osCommands);
+            SystemCommandExecutor commandExecutor = new SystemCommandExecutor(osCommands);
+
+            TimeElapsedThread thread = new TimeElapsedThread(log);
             thread.start();
             int result = commandExecutor.executeCommand();
 
@@ -86,23 +88,37 @@ public class LinuxMqsiCommandLauncher extends MqsiCommandLauncher {
             thread.interrupt();
 
             log.info("process ended with a " + result + " value");
-
+            tf.delete();
             if (result != 0) {
                 throw new MojoFailureException(stdout.toString());
             }
 
         } catch (Exception e) {
-            log.info("unable to execute " + mqsiCommand + " with arguments " + commands);
+            log.info("(linux) unable to execute " + mqsiCommand + " with arguments " + osCommands);
             throw new MojoFailureException("Unable to execute command(s): " + osCommands + " : " + e);
         }
 
 
     }
 
-    private void addMqsiSetProfileCommands(Log log, String pathToMqsiProfileScript, String mqsiPrefixCommands, final ArrayList<String> osCommands) throws MojoFailureException {
+    private void addMqsiSetProfileCommands(Log log, final ArrayList<String> osCommands) throws MojoFailureException {
         osCommands.add("/bin/bash");
-        osCommands.add("-c");
-        osCommands.add("if ! which mqsilist; then source " + pathToMqsiProfileScript + "; fi && ");
+    }
+
+    public File createTempScript(String pathToMqsiProfileScript, String command) throws IOException {
+        File tempScript = File.createTempFile("script-createbar", null);
+
+        Writer streamWriter = new OutputStreamWriter(new FileOutputStream(
+                tempScript));
+        PrintWriter printWriter = new PrintWriter(streamWriter);
+
+        printWriter.println("#!/bin/bash");
+        printWriter.println("cat " + tempScript.getAbsolutePath());
+        printWriter.println("if ! which mqsilist; then source " + pathToMqsiProfileScript + "; fi");
+        printWriter.println(command);
+        printWriter.close();
+
+        return tempScript;
     }
 
 }
