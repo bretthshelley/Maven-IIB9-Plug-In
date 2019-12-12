@@ -1,0 +1,65 @@
+US 7919
+
+EPIC: 835CAP - 01: 835 CAP
+
+8/27/2019: Darrell Adams requested updates to Owner, EBIZ and OIT Approved User Story Dates. Email sent to Sindhuja Babu; Mike S; and Mike Strickland.
+
+
+US7920
+
+As a Claims Processor, I want 835 transactions for Central Fee to be compliant so that our transactions can be processed.
+
+8/27/2019: Darrell Adams requested updates to Owner, EBIZ and OIT Approved User Story Dates. Email sent to Sindhuja Babu; Mike S; and Mike Strickland.
+
+
+US7923
+
+STORY: 835CAP - 01.01.02: Modify the database tables (Fee_Claim_Payment_Lines)
+
+As a Claims Processor, I want to modify the Fee_Claim_Payment_Lines table so that our new FMS Doc ID can be stored in 835_TRN02.
+
+Acceptance Criteria: Verify that the Fee_Claim_Payment_Lines table now has a 16 byte column labeled “835_TRN02” in FPPS_OWNER
+
+1. Need to determine how to extract FMS Doc ID from 
+Verify data requirements with Jerry Simpson pertaining to this requirement.
+
+
+US 10052
+
+STORY: 835CAP - 01.01.01: Retrieve FMS Doc ID
+
+As a Claims Processor, I want to retrieve FMS Doc IDs for Central Fee so that our transactions can be processed.
+
+Acceptance Criteria: Verify that the fixed length data is pulled in . This value shall be stored in the Fee_Claim_Payment_Lines table in the column “TRN02_835” on FPPS_Owner schema.
+
+
+5/8 Team should know where the existing functionality is for us to completely validate. We also need sample FMS document. What value we need to put in 835_TRN02 and how do we match - FTC will reach out to AJ M to get info
+
+US10056
+
+STORY: 835CAP - 01.01.03: Reconciliation between payment via Fee_Claim_Payment and Fee_Claim_Payment_Lines
+
+As a Claims Processor, I want to verify that claims in the Fee_Claim_Payment and Fee_Claim_Payment_Lines tables match the 835 being sent out so that our remittance advice is accurate.
+
+Acceptance Criteria: Verify that the payments listed in the 835 to be sent out match those stored in the Fee_Claim_Payment and Fee_Claim_Payment_Lines on FPPS_Owner schema.
+If the values match, then resolve reconciliation and send to E_REPOS Staging Table (STG_835_HDR_TRN) consistent with the Current State
+If the values do not match, then error out consistent with the Current State
+The 835 Process must now pull the value from TRN02_835 instead of Check Number
+
+
+US7923
+
+STORY: 835CAP - 01.01.02: Modify the database tables (Fee_Claim_Payment_Lines)
+
+As a Claims Processor, I want to modify the Fee_Claim_Payment_Lines table so that our new FMS Doc ID can be stored in 835_TRN02.
+
+Acceptance Criteria: Verify that the Fee_Claim_Payment_Lines table now has a 16 byte column labeled “835_TRN02” in FPPS_OWNER
+
+
+
+
+
+
+
+
+
