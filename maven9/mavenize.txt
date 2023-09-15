@@ -1,0 +1,14 @@
+------------------------------------------------------------------------
+
+	The 'mavenize' goal of the iib-maven-plugin can be run using an execution script similar to the following:
+
+	mvn 
+	-Diib.overwrite=true 
+	-Diib.groupId=<your.group.id> 
+	-Diib.version=1.0-SNAPSHOT 
+	-Diib.workspace=C:\Users\Brett\IBM\IntegrationToolkit90\testworkspace  
+	-Diib.distribution.repository=http://www.vadosity.com:8080/nexus/content/repositories/snapshots/
+	-Dmaven.multiModuleProjectDirectory=%M2_HOME%
+	ch.sbb.maven.plugins:iib-maven-plugin:9.0-SNAPSHOT:mavenize
+	
+	Note:  The iib.distribution.repository argument should match your local maven distribution repository. 
