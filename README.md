@@ -6,28 +6,6 @@ expect of a maven build life-cycle.  The IIB9 Maven Plugin has been updated to s
 <p>The reworked source code for this IIB-Maven-Plugin is available on GitHub at <a href="https://github.com/bretthshelley/Maven-IIB9-Plug-In">https://github.com/bretthshelley/Maven-IIB9-Plug-In</a>.
 Questions may be sent directly to <a href="mailto:bshelley585@gmail.com">bshelley585@gmail.com</a>.
 
-<li><a href="#QuickStart">Quick-Start</a></li> 
-<ul>
-	<li><a href="#InstallMaven">1. Install Maven</a></li>
-	<li><a href="#UpdateMavenSettings">2. Update Maven Settings</a></li>
-	<li><a href="#GetPlugin">3. Download this Plug-In</a></li>
-	<li><a href="#InstallProxy">4. Install the ConfigManagerProxy in your local repository</a></li>
-	<li><a href="#InstallPlugin">5. Install this Plug-In in your local repository</a></li>
-	<li><a href="#RunningHelp">6. Generate this help file (Optional)</a></li>
-	<li><a href="#Mavenize">7. Mavenize an IIB9 workspace</a></li>
-	<li><a href="#UploadLibs">8. Upload Common Libraries to a Maven Distribution Repository (Optional)</a></li>
-	<li><a href="#DeleteOtherProjects">9. Delete All-but-One Project (Optional)</a></li>
-	<li><a href="#VerifyPom">10. Verify Pom.xml</a></li>
-	<li><a href="#RunGenerateResources">11. Run Generate Resources</a></li>
-	<li><a href="#RunCompile">12. Run Compile</a></li>
-	<li><a href="#RunTestCompile">13. Run Test Compile</a></li>
-	<li><a href="#RunProcessClasses">14. Run Process Classes</a></li>
-	<li><a href="#RunPreIntegrationTest">15. Run Pre-Integration-Test</a></li>
-	<li><a href="#RunPreIntegrationTest">16. Run Integration-Test</a></li>
-	<li><a href="#RunDeploy">17. Run Deploy</a></li>
-</ul>
-</li>
-
 <div class="section">
 <h3><a name="Overview">IIB9 Maven Plug-In Overview</a></h3>
 <p>This document offers many details and tips to use the Maven IIB9 Plug-In.  It needs to since the IIB BAR lifecycle differs significantly from a normal maven artifact like a jar file.  
