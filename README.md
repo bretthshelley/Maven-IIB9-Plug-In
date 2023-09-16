@@ -6,24 +6,6 @@ expect of a maven build life-cycle.  The IIB9 Maven Plugin has been updated to s
 <p>The reworked source code for this IIB-Maven-Plugin is available on GitHub at <a href="https://github.com/bretthshelley/Maven-IIB9-Plug-In">https://github.com/bretthshelley/Maven-IIB9-Plug-In</a>.
 Questions may be sent directly to <a href="mailto:bshelley585@gmail.com">bshelley585@gmail.com</a>.
 
-<h3><a name="Table_Of_Contents"></a>Table Of Contents</h3>
-<ul>
-<li><a href="#Overview">IIB9 Maven Plug-In Overview</a></li>
-<li><a href="#Basics">IIB9 Maven Plug-In Build Lifecycle Basics</a></li>
-<ul>
-<li><a href="#IibBarLifecycle">The IIB-BAR Build Lifecycle</a></li>
-<li><a href="#IibZipLifecycle">The IIB-ZIP Build Lifecycle</a></li>
-</ul>
-<li><a href="#UsingThePlugIn">Using the Plug-In</a>
-<ul>
-<li><a href="#WorkspacePom">Workspace Pom.xml with modules</a></li>
-<li><a href="#LibraryPom">Library Pom.xml</a></li>
-<li><a href="#RunningWorkspacePom">Running the Workspace Pom</a></li>
-<li><a href="#BuildingYourIIB9ApplicationProject">Building Your IIB9 Application Project</a></li>
-<li><a href="#ConfigParams">IIB9 Application Configuration Parameters</a></li>
-<li><a href="#RunIIBBAR">Running the IIB-BAR Lifecycle</a></li>
-</ul>
-
 <li><a href="#AdditionalNotes">Additional Notes:</a></li>
   <ul>
   <li><a href="#SolvingThePomXmlProblem">Solving the IIB9 pom.xml problem</a></li> 
