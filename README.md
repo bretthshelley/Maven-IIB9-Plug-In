@@ -6,13 +6,6 @@ expect of a maven build life-cycle.  The IIB9 Maven Plugin has been updated to s
 <p>The reworked source code for this IIB-Maven-Plugin is available on GitHub at <a href="https://github.com/bretthshelley/Maven-IIB9-Plug-In">https://github.com/bretthshelley/Maven-IIB9-Plug-In</a>.
 Questions may be sent directly to <a href="mailto:bshelley585@gmail.com">bshelley585@gmail.com</a>.
 
-<li><a href="#AdditionalNotes">Additional Notes:</a></li>
-  <ul>
-  <li><a href="#SolvingThePomXmlProblem">Solving the IIB9 pom.xml problem</a></li> 
-  <li><a href="#skipFeature">skip and skipTo Feature</a></li>
-  <li><a href="#mqsiPrefixCommands">mqsiPrefixCommands configuration parameter</a></li>
-  </ul>
-</li>
 <li><a href="#QuickStart">Quick-Start</a></li> 
 <ul>
 	<li><a href="#InstallMaven">1. Install Maven</a></li>
